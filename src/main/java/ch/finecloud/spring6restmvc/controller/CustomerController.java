@@ -16,29 +16,31 @@ import java.util.UUID;
 @Slf4j
 @AllArgsConstructor
 @RestController
-@RequestMapping("/api/v1/customers")
 public class CustomerController {
+    public static final String BASE_URL = "/api/v1/customers";
+    public static final String BASE_URL_ID = BASE_URL + "/{customerId}";
+
     private final CustomerService customerService;
 
-    @PatchMapping("/{customerId}")
+    @PatchMapping(BASE_URL_ID)
     public ResponseEntity updateCustomerPatchById(@PathVariable("customerId") UUID customerId, @RequestBody Customer customer) {
         customerService.patchCustomerById(customerId, customer);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
-    @DeleteMapping("/{customerId}")
+    @DeleteMapping(BASE_URL_ID)
     public ResponseEntity deleteById(@PathVariable("customerId") UUID customerId) {
         customerService.deleteById(customerId);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
-    @PutMapping("/{customerId}")
+    @PutMapping(BASE_URL_ID)
     public ResponseEntity updateById(@PathVariable("customerId") UUID customerId, @RequestBody Customer customer) {
         customerService.updateCustomerById(customerId, customer);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
-    @PostMapping
+    @PostMapping(BASE_URL)
     public ResponseEntity handlePost(@RequestBody Customer customer) {
         Customer savedCustomer = customerService.saveNewCustomer(customer);
         HttpHeaders headers = new HttpHeaders();
@@ -46,13 +48,13 @@ public class CustomerController {
         return new ResponseEntity(headers, HttpStatus.CREATED);
     }
 
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping(BASE_URL)
     public List<Customer> listCustomers() {
         log.debug("listCustomers was called, in Controller");
         return customerService.listCustomers();
     }
 
-    @RequestMapping(value = "{customerId}", method = RequestMethod.GET)
+    @GetMapping(BASE_URL_ID)
     public Customer getCustomerById(@PathVariable("customerId") UUID customerId) {
         log.debug("getCustomerById was called with id: " + customerId + ", in Controller");
         return customerService.getCustomerById(customerId);

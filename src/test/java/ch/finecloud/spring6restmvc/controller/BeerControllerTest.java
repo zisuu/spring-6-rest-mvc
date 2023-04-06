@@ -3,7 +3,6 @@ package ch.finecloud.spring6restmvc.controller;
 import ch.finecloud.spring6restmvc.model.Beer;
 import ch.finecloud.spring6restmvc.services.BeerService;
 import ch.finecloud.spring6restmvc.services.BeerServiceImpl;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,7 +56,7 @@ class BeerControllerTest {
         Beer testBeer = beerServiceImpl.listBeers().get(0);
         Map<String, Object> beerMap = new HashMap<>();
         beerMap.put("beerName", "New Beer Name");
-        mockMvc.perform(patch("/api/v1/beers/" + testBeer.getId())
+        mockMvc.perform(patch(BeerController.BASE_URL_ID, testBeer.getId())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(beerMap)))
@@ -70,7 +69,7 @@ class BeerControllerTest {
     @Test
     void testDeleteBeer() throws Exception {
         Beer testBeer = beerServiceImpl.listBeers().get(0);
-        mockMvc.perform(delete("/api/v1/beers/" + testBeer.getId())
+        mockMvc.perform(delete(BeerController.BASE_URL_ID, testBeer.getId())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
@@ -81,7 +80,7 @@ class BeerControllerTest {
     @Test
     void testUpdateBeer() throws Exception {
         Beer testBeer = beerServiceImpl.listBeers().get(0);
-        mockMvc.perform(put("/api/v1/beers/" + testBeer.getId())
+        mockMvc.perform(put(BeerController.BASE_URL_ID, testBeer.getId())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(testBeer)))
@@ -95,7 +94,7 @@ class BeerControllerTest {
         testBeer.setId(null);
         testBeer.setVersion(null);
         given(beerService.saveNewBeer(any(Beer.class))).willReturn(beerServiceImpl.listBeers().get(1));
-        mockMvc.perform(post("/api/v1/beers")
+        mockMvc.perform(post(BeerController.BASE_URL)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(testBeer)))
@@ -106,7 +105,7 @@ class BeerControllerTest {
     @Test
     void testListBeers() throws Exception {
         given(beerService.listBeers()).willReturn(beerServiceImpl.listBeers());
-        mockMvc.perform(get("/api/v1/beers")
+        mockMvc.perform(get(BeerController.BASE_URL)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -117,7 +116,7 @@ class BeerControllerTest {
     void getBeerById() throws Exception {
         Beer testBeer = beerServiceImpl.listBeers().get(0);
         given(beerService.getBeerById(testBeer.getId())).willReturn(testBeer);
-        mockMvc.perform(get("/api/v1/beers/" + testBeer.getId())
+        mockMvc.perform(get(BeerController.BASE_URL_ID, testBeer.getId())
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))

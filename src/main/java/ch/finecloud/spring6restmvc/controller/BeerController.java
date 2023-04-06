@@ -15,30 +15,30 @@ import java.util.UUID;
 @Slf4j
 @AllArgsConstructor
 @RestController
-@RequestMapping("/api/v1/beers")
 public class BeerController {
+    public static final String BASE_URL = "/api/v1/beers";
+    public static final String BASE_URL_ID = BASE_URL + "/{beerId}";
     private final BeerService beerService;
 
-    @PatchMapping("/{beerId}")
+    @PatchMapping(BASE_URL_ID)
     public ResponseEntity updateBeerPatchById(@PathVariable("beerId") UUID beerId, @RequestBody Beer beer) {
         beerService.patchBeerById(beerId, beer);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
-    @DeleteMapping("/{beerId}")
+    @DeleteMapping(BASE_URL_ID)
     public ResponseEntity deleteById(@PathVariable("beerId") UUID beerId) {
         beerService.deleteById(beerId);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
-    @PutMapping("/{beerId}")
+    @PutMapping(BASE_URL_ID)
     public ResponseEntity updateById(@PathVariable("beerId") UUID beerId, @RequestBody Beer beer) {
         beerService.updateBeerById(beerId, beer);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
-    @PostMapping
-//    @RequestMapping(method = RequestMethod.POST)
+    @PostMapping(BASE_URL)
     public ResponseEntity handlePost(@RequestBody Beer beer) {
         Beer savedBeer = beerService.saveNewBeer(beer);
         HttpHeaders headers = new HttpHeaders();
@@ -46,13 +46,13 @@ public class BeerController {
         return new ResponseEntity(headers, HttpStatus.CREATED);
     }
 
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping(BASE_URL)
     public List<Beer> listBeers() {
         log.debug("listBeers was called, in Controller");
         return beerService.listBeers();
     }
 
-    @RequestMapping(value = "{beerId}", method = RequestMethod.GET)
+    @GetMapping(BASE_URL_ID)
     public Beer getBeerById(@PathVariable("beerId") UUID beerId) {
         log.debug("getBeerById was called with id: " + beerId + ", in Controller");
         return beerService.getBeerById(beerId);
