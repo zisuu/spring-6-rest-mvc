@@ -1,8 +1,10 @@
 package ch.finecloud.spring6restmvc.services;
 
+import ch.finecloud.spring6restmvc.model.Beer;
 import ch.finecloud.spring6restmvc.model.Customer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -54,5 +56,40 @@ public class CustomerServiceImpl implements CustomerService {
     public Customer getCustomerById(UUID id) {
         log.debug("getCustomerById was called with id: " + id + ", in Service");
         return customerMap.get(id);
+    }
+
+    @Override
+    public Customer saveNewCustomer(Customer customer) {
+        Customer savedCustomer = Customer.builder()
+                .id(UUID.randomUUID())
+                .createdDate(LocalDateTime.now())
+                .lastModifiedDate(LocalDateTime.now())
+                .customerName(customer.getCustomerName())
+                .build();
+
+        customerMap.put(savedCustomer.getId(), savedCustomer);
+        return savedCustomer;
+    }
+
+    @Override
+    public void updateCustomerById(UUID customerId, Customer customer) {
+        Customer existingCustomer = customerMap.get(customerId);
+        existingCustomer.setCustomerName(customer.getCustomerName());
+        customerMap.put(existingCustomer.getId(), existingCustomer);
+    }
+
+    @Override
+    public void deleteById(UUID customerId) {
+        customerMap.remove(customerId);
+    }
+
+    @Override
+    public void patchCustomerById(UUID customerId, Customer customer) {
+        Customer existingcustomer = customerMap.get(customerId);
+
+        if(StringUtils.hasText(customer.getCustomerName())) {
+            existingcustomer.setCustomerName(customer.getCustomerName());
+        }
+
     }
 }
