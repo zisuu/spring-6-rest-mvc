@@ -57,7 +57,7 @@ public class CustomerController {
     @GetMapping(BASE_URL_ID)
     public Customer getCustomerById(@PathVariable("customerId") UUID customerId) {
         log.debug("getCustomerById was called with id: " + customerId + ", in Controller");
-        return customerService.getCustomerById(customerId);
+        return customerService.getCustomerById(customerId).orElseThrow(NotFoundException::new);
     }
 
 }

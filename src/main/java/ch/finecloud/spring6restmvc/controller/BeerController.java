@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -55,7 +56,7 @@ public class BeerController {
     @GetMapping(BASE_URL_ID)
     public Beer getBeerById(@PathVariable("beerId") UUID beerId) {
         log.debug("getBeerById was called with id: " + beerId + ", in Controller");
-        return beerService.getBeerById(beerId);
+        return beerService.getBeerById(beerId).orElseThrow(NotFoundException::new);
     }
 
 }
