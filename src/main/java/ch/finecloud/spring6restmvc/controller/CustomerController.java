@@ -1,7 +1,6 @@
 package ch.finecloud.spring6restmvc.controller;
 
-import ch.finecloud.spring6restmvc.model.Beer;
-import ch.finecloud.spring6restmvc.model.Customer;
+import ch.finecloud.spring6restmvc.model.CustomerDTO;
 import ch.finecloud.spring6restmvc.services.CustomerService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,8 +22,8 @@ public class CustomerController {
     private final CustomerService customerService;
 
     @PatchMapping(BASE_URL_ID)
-    public ResponseEntity updateCustomerPatchById(@PathVariable("customerId") UUID customerId, @RequestBody Customer customer) {
-        customerService.patchCustomerById(customerId, customer);
+    public ResponseEntity updateCustomerPatchById(@PathVariable("customerId") UUID customerId, @RequestBody CustomerDTO customerDTO) {
+        customerService.patchCustomerById(customerId, customerDTO);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
@@ -35,27 +34,27 @@ public class CustomerController {
     }
 
     @PutMapping(BASE_URL_ID)
-    public ResponseEntity updateById(@PathVariable("customerId") UUID customerId, @RequestBody Customer customer) {
-        customerService.updateCustomerById(customerId, customer);
+    public ResponseEntity updateById(@PathVariable("customerId") UUID customerId, @RequestBody CustomerDTO customerDTO) {
+        customerService.updateCustomerById(customerId, customerDTO);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping(BASE_URL)
-    public ResponseEntity handlePost(@RequestBody Customer customer) {
-        Customer savedCustomer = customerService.saveNewCustomer(customer);
+    public ResponseEntity handlePost(@RequestBody CustomerDTO customerDTO) {
+        CustomerDTO savedCustomerDTO = customerService.saveNewCustomer(customerDTO);
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Location", "/api/v1/customers/" + savedCustomer.getId().toString());
+        headers.add("Location", "/api/v1/customers/" + savedCustomerDTO.getId().toString());
         return new ResponseEntity(headers, HttpStatus.CREATED);
     }
 
     @GetMapping(BASE_URL)
-    public List<Customer> listCustomers() {
+    public List<CustomerDTO> listCustomers() {
         log.debug("listCustomers was called, in Controller");
         return customerService.listCustomers();
     }
 
     @GetMapping(BASE_URL_ID)
-    public Customer getCustomerById(@PathVariable("customerId") UUID customerId) {
+    public CustomerDTO getCustomerById(@PathVariable("customerId") UUID customerId) {
         log.debug("getCustomerById was called with id: " + customerId + ", in Controller");
         return customerService.getCustomerById(customerId).orElseThrow(NotFoundException::new);
     }
