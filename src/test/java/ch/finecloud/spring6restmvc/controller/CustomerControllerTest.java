@@ -1,5 +1,6 @@
 package ch.finecloud.spring6restmvc.controller;
 
+import ch.finecloud.spring6restmvc.model.BeerDTO;
 import ch.finecloud.spring6restmvc.model.CustomerDTO;
 import ch.finecloud.spring6restmvc.services.CustomerService;
 import ch.finecloud.spring6restmvc.services.CustomerServiceImpl;
@@ -70,6 +71,7 @@ class CustomerControllerTest {
     @Test
     void testDeleteCustomer() throws Exception {
         CustomerDTO testCustomerDTO = customerServiceImpl.listCustomers().get(0);
+        given(customerService.deleteById(any())).willReturn(true);
         mockMvc.perform(delete(CustomerController.BASE_URL_ID, testCustomerDTO.getId())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -82,6 +84,7 @@ class CustomerControllerTest {
     @Test
     void testUpdateCustomer() throws Exception {
         CustomerDTO testCustomerDTO = customerServiceImpl.listCustomers().get(0);
+        given(customerService.updateCustomerById(any(UUID.class), any(CustomerDTO.class))).willReturn(Optional.of(testCustomerDTO));
         mockMvc.perform(put(CustomerController.BASE_URL_ID, testCustomerDTO.getId())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)

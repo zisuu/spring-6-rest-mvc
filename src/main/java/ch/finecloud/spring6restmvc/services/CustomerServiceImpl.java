@@ -71,24 +71,26 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public void updateCustomerById(UUID customerId, CustomerDTO customerDTO) {
+    public Optional<CustomerDTO> updateCustomerById(UUID customerId, CustomerDTO customerDTO) {
         CustomerDTO existingCustomerDTO = customerMap.get(customerId);
         existingCustomerDTO.setCustomerName(customerDTO.getCustomerName());
         customerMap.put(existingCustomerDTO.getId(), existingCustomerDTO);
+        return Optional.of(existingCustomerDTO);
     }
 
     @Override
-    public void deleteById(UUID customerId) {
+    public Boolean deleteById(UUID customerId) {
         customerMap.remove(customerId);
+        return true;
     }
 
     @Override
-    public void patchCustomerById(UUID customerId, CustomerDTO customerDTO) {
+    public Optional<CustomerDTO> patchCustomerById(UUID customerId, CustomerDTO customerDTO) {
         CustomerDTO existingcustomer = customerMap.get(customerId);
 
         if(StringUtils.hasText(customerDTO.getCustomerName())) {
             existingcustomer.setCustomerName(customerDTO.getCustomerName());
         }
-
+        return Optional.of(existingcustomer);
     }
 }
