@@ -65,28 +65,31 @@ public class BeerServiceJPA implements BeerService {
     }
 
     @Override
-    public void patchBeerById(UUID beerId, BeerDTO beerDTO) {
+    public Optional<BeerDTO> patchBeerById(UUID beerId, BeerDTO beerDTO) {
         AtomicReference<Optional<BeerDTO>> atomicReference = new AtomicReference<>();
+
         beerRepository.findById(beerId).ifPresentOrElse(foundBeer -> {
-            BeerDTO existingBeerDTO = beerMapper.beerToBeerDto(foundBeer);
-            if(StringUtils.hasText(beerDTO.getBeerName())) {
-                existingBeerDTO.setBeerName(beerDTO.getBeerName());
+            if (StringUtils.hasText(beerDTO.getBeerName())){
+                foundBeer.setBeerName(beerDTO.getBeerName());
             }
-            if(beerDTO.getBeerStyle() != null) {
-                existingBeerDTO.setBeerStyle(beerDTO.getBeerStyle());
+            if (beerDTO.getBeerStyle() != null){
+                foundBeer.setBeerStyle(beerDTO.getBeerStyle());
             }
-            if(beerDTO.getPrice() != null) {
-                existingBeerDTO.setPrice(beerDTO.getPrice());
+            if (StringUtils.hasText(beerDTO.getUpc())){
+                foundBeer.setUpc(beerDTO.getUpc());
             }
-            if(beerDTO.getQuantityOnHand() != null) {
-                existingBeerDTO.setQuantityOnHand(beerDTO.getQuantityOnHand());
+            if (beerDTO.getPrice() != null){
+                foundBeer.setPrice(beerDTO.getPrice());
             }
-            if(StringUtils.hasText(beerDTO.getUpc())) {
-                existingBeerDTO.setUpc(beerDTO.getUpc());
+            if (beerDTO.getQuantityOnHand() != null){
+                foundBeer.setQuantityOnHand(beerDTO.getQuantityOnHand());
             }
-            atomicReference.set(Optional.of(beerMapper.beerToBeerDto(beerRepository.save(foundBeer))));
+            atomicReference.set(Optional.of(beerMapper
+                    .beerToBeerDto(beerRepository.save(foundBeer))));
         }, () -> {
             atomicReference.set(Optional.empty());
         });
+
+        return atomicReference.get();
     }
 }

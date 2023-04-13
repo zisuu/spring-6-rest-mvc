@@ -3,6 +3,7 @@ package ch.finecloud.spring6restmvc.controller;
 import ch.finecloud.spring6restmvc.model.BeerDTO;
 import ch.finecloud.spring6restmvc.services.BeerService;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -14,7 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Slf4j
-@AllArgsConstructor
+@RequiredArgsConstructor
 @RestController
 public class BeerController {
     public static final String BASE_URL = "/api/v1/beers";

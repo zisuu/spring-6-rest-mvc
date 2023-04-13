@@ -24,12 +24,6 @@ public class BootstrapData implements CommandLineRunner {
     public void run(String... args) throws Exception {
         loadBeerData();
         loadCustomerData();
-
-
-        System.out.println("Loading Beer Data");
-        System.out.println("Number of Beers: " + beerRepository.count());
-        System.out.println("Loading Customer Data");
-        System.out.println("Number of Customers: " + customerRepository.count());
     }
 
     private void loadBeerData() {
@@ -63,7 +57,9 @@ public class BootstrapData implements CommandLineRunner {
                     .createdDate(LocalDateTime.now())
                     .updateDate(LocalDateTime.now())
                     .build();
-            beerRepository.saveAll(Arrays.asList(beer1, beer2, beer3));
+            beerRepository.save(beer1);
+            beerRepository.save(beer2);
+            beerRepository.save(beer3);
         }
     }
 
