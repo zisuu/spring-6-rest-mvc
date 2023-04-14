@@ -1,7 +1,9 @@
 package ch.finecloud.spring6restmvc.services;
 
+import ch.finecloud.spring6restmvc.entities.Beer;
 import ch.finecloud.spring6restmvc.mappers.BeerMapper;
 import ch.finecloud.spring6restmvc.model.BeerDTO;
+import ch.finecloud.spring6restmvc.model.BeerStyle;
 import ch.finecloud.spring6restmvc.repositories.BeerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
@@ -23,10 +25,26 @@ public class BeerServiceJPA implements BeerService {
     private final BeerMapper beerMapper;
 
     @Override
-    public List<BeerDTO> listBeers() {
-        return beerRepository.findAll().stream()
+    public List<BeerDTO> listBeers(String beerName, BeerStyle beerStyle) {
+        List<Beer> beerList;
+        if (StringUtils.hasText(beerName) && beerStyle == null) {
+            beerList = listBeerByName(beerName);
+        } else if (!StringUtils.hasText(beerName) && beerStyle != null) {
+            beerList = listBeerByStyle(beerStyle);
+        } else {
+            beerList = beerRepository.findAll();
+        }
+        return beerList.stream()
                 .map(beerMapper::beerToBeerDto)
                 .collect(Collectors.toList());
+    }
+
+    public List<Beer> listBeerByStyle(BeerStyle beerStyle) {
+        return beerRepository.findAllByBeerStyle(beerStyle);
+    }
+
+    public List<Beer> listBeerByName(String beerName) {
+        return beerRepository.findAllByBeerNameIsLikeIgnoreCase("%" + beerName + "%");
     }
 
     @Override
@@ -69,19 +87,19 @@ public class BeerServiceJPA implements BeerService {
         AtomicReference<Optional<BeerDTO>> atomicReference = new AtomicReference<>();
 
         beerRepository.findById(beerId).ifPresentOrElse(foundBeer -> {
-            if (StringUtils.hasText(beerDTO.getBeerName())){
+            if (StringUtils.hasText(beerDTO.getBeerName())) {
                 foundBeer.setBeerName(beerDTO.getBeerName());
             }
-            if (beerDTO.getBeerStyle() != null){
+            if (beerDTO.getBeerStyle() != null) {
                 foundBeer.setBeerStyle(beerDTO.getBeerStyle());
             }
-            if (StringUtils.hasText(beerDTO.getUpc())){
+            if (StringUtils.hasText(beerDTO.getUpc())) {
                 foundBeer.setUpc(beerDTO.getUpc());
             }
-            if (beerDTO.getPrice() != null){
+            if (beerDTO.getPrice() != null) {
                 foundBeer.setPrice(beerDTO.getPrice());
             }
-            if (beerDTO.getQuantityOnHand() != null){
+            if (beerDTO.getQuantityOnHand() != null) {
                 foundBeer.setQuantityOnHand(beerDTO.getQuantityOnHand());
             }
             atomicReference.set(Optional.of(beerMapper

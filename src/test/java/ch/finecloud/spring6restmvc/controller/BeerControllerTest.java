@@ -3,7 +3,6 @@ package ch.finecloud.spring6restmvc.controller;
 import ch.finecloud.spring6restmvc.model.BeerDTO;
 import ch.finecloud.spring6restmvc.services.BeerService;
 import ch.finecloud.spring6restmvc.services.BeerServiceImpl;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,7 +56,7 @@ class BeerControllerTest {
     @Test
     void testCreateBeerNullBeerName() throws Exception {
         BeerDTO beerDTO = BeerDTO.builder().build();
-        given(beerService.saveNewBeer(any(BeerDTO.class))).willReturn(beerServiceImpl.listBeers().get(1));
+        given(beerService.saveNewBeer(any(BeerDTO.class))).willReturn(beerServiceImpl.listBeers(null, null).get(1));
         MvcResult MvcResult = mockMvc.perform(post(BeerController.BASE_URL)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -70,7 +69,7 @@ class BeerControllerTest {
 
     @Test
     void testUpdateBeerBlankName() throws Exception {
-        BeerDTO testBeerDTO = beerServiceImpl.listBeers().get(0);
+        BeerDTO testBeerDTO = beerServiceImpl.listBeers(null, null).get(0);
         testBeerDTO.setBeerName("");
         given(beerService.updateBeerById(any(UUID.class), any(BeerDTO.class))).willReturn(Optional.of(testBeerDTO));
         MvcResult MvcResult = mockMvc.perform(put(BeerController.BASE_URL_ID, testBeerDTO.getId())
@@ -85,7 +84,7 @@ class BeerControllerTest {
 
     @Test
     void testPatchBeer() throws Exception {
-        BeerDTO testBeerDTO = beerServiceImpl.listBeers().get(0);
+        BeerDTO testBeerDTO = beerServiceImpl.listBeers(null, null).get(0);
         Map<String, Object> beerMap = new HashMap<>();
         beerMap.put("beerName", "New BeerDTO Name");
         mockMvc.perform(patch(BeerController.BASE_URL_ID, testBeerDTO.getId())
@@ -100,7 +99,7 @@ class BeerControllerTest {
 
     @Test
     void testDeleteBeer() throws Exception {
-        BeerDTO testBeerDTO = beerServiceImpl.listBeers().get(0);
+        BeerDTO testBeerDTO = beerServiceImpl.listBeers(null, null).get(0);
         given(beerService.deleteById(any())).willReturn(true);
         mockMvc.perform(delete(BeerController.BASE_URL_ID, testBeerDTO.getId())
                         .accept(MediaType.APPLICATION_JSON)
@@ -112,7 +111,7 @@ class BeerControllerTest {
 
     @Test
     void testUpdateBeer() throws Exception {
-        BeerDTO testBeerDTO = beerServiceImpl.listBeers().get(0);
+        BeerDTO testBeerDTO = beerServiceImpl.listBeers(null, null).get(0);
         given(beerService.updateBeerById(any(UUID.class), any(BeerDTO.class))).willReturn(Optional.of(testBeerDTO));
         mockMvc.perform(put(BeerController.BASE_URL_ID, testBeerDTO.getId())
                         .accept(MediaType.APPLICATION_JSON)
@@ -124,10 +123,10 @@ class BeerControllerTest {
 
     @Test
     void testCreateNewBeer() throws Exception {
-        BeerDTO testBeerDTO = beerServiceImpl.listBeers().get(0);
+        BeerDTO testBeerDTO = beerServiceImpl.listBeers(null, null).get(0);
         testBeerDTO.setId(null);
         testBeerDTO.setVersion(null);
-        given(beerService.saveNewBeer(any(BeerDTO.class))).willReturn(beerServiceImpl.listBeers().get(1));
+        given(beerService.saveNewBeer(any(BeerDTO.class))).willReturn(beerServiceImpl.listBeers(null, null).get(1));
         mockMvc.perform(post(BeerController.BASE_URL)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -138,7 +137,7 @@ class BeerControllerTest {
 
     @Test
     void testListBeers() throws Exception {
-        given(beerService.listBeers()).willReturn(beerServiceImpl.listBeers());
+        given(beerService.listBeers(null, null)).willReturn(beerServiceImpl.listBeers(null, null));
         mockMvc.perform(get(BeerController.BASE_URL)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -148,7 +147,7 @@ class BeerControllerTest {
 
     @Test
     void getBeerById() throws Exception {
-        BeerDTO testBeerDTO = beerServiceImpl.listBeers().get(0);
+        BeerDTO testBeerDTO = beerServiceImpl.listBeers(null, null).get(0);
         given(beerService.getBeerById(testBeerDTO.getId())).willReturn(Optional.of(testBeerDTO));
         mockMvc.perform(get(BeerController.BASE_URL_ID, testBeerDTO.getId())
                         .accept(MediaType.APPLICATION_JSON))

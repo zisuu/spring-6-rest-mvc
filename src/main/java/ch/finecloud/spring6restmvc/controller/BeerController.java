@@ -1,8 +1,8 @@
 package ch.finecloud.spring6restmvc.controller;
 
 import ch.finecloud.spring6restmvc.model.BeerDTO;
+import ch.finecloud.spring6restmvc.model.BeerStyle;
 import ch.finecloud.spring6restmvc.services.BeerService;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -53,9 +53,9 @@ public class BeerController {
     }
 
     @GetMapping(BASE_URL)
-    public List<BeerDTO> listBeers() {
+    public List<BeerDTO> listBeers(@RequestParam(required = false) String beerName, @RequestParam(required = false) BeerStyle beerStyle) {
         log.debug("listBeers was called, in Controller");
-        return beerService.listBeers();
+        return beerService.listBeers(beerName, beerStyle);
     }
 
     @GetMapping(BASE_URL_ID)

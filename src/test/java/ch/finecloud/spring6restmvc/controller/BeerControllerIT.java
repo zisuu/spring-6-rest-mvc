@@ -3,6 +3,7 @@ package ch.finecloud.spring6restmvc.controller;
 import ch.finecloud.spring6restmvc.entities.Beer;
 import ch.finecloud.spring6restmvc.mappers.BeerMapper;
 import ch.finecloud.spring6restmvc.model.BeerDTO;
+import ch.finecloud.spring6restmvc.model.BeerStyle;
 import ch.finecloud.spring6restmvc.repositories.BeerRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
@@ -30,6 +31,7 @@ import java.util.UUID;
 import static net.bytebuddy.matcher.ElementMatchers.is;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -57,6 +59,20 @@ class BeerControllerIT {
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+    }
+
+    @Test
+    void testListBeerByBeerStyle() throws Exception {
+        mockMvc.perform(get(BeerController.BASE_URL).queryParam("beerStyle", BeerStyle.LAGER.name()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", CoreMatchers.is(39)));
+    }
+
+    @Test
+    void testListBeerByName() throws Exception {
+        mockMvc.perform(get(BeerController.BASE_URL).queryParam("beerName", "IPA"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", CoreMatchers.is(336)));
     }
 
     @Test
@@ -139,7 +155,7 @@ class BeerControllerIT {
 
     @Test
     void testListBeers() {
-        List<BeerDTO> beerDTOList = beerController.listBeers();
+        List<BeerDTO> beerDTOList = beerController.listBeers(null, null);
         assertThat(beerDTOList.size()).isEqualTo(2413);
     }
 
@@ -148,7 +164,7 @@ class BeerControllerIT {
     @Test
     void testEmptyList() {
         beerRepository.deleteAll();
-        List<BeerDTO> beerDTOList = beerController.listBeers();
+        List<BeerDTO> beerDTOList = beerController.listBeers(null, null);
         assertThat(beerDTOList.size()).isEqualTo(0);
     }
 }
