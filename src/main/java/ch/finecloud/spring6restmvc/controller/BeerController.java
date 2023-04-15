@@ -53,9 +53,11 @@ public class BeerController {
     }
 
     @GetMapping(BASE_URL)
-    public List<BeerDTO> listBeers(@RequestParam(required = false) String beerName, @RequestParam(required = false) BeerStyle beerStyle) {
+    public List<BeerDTO> listBeers(@RequestParam(required = false) String beerName,
+                                   @RequestParam(required = false) BeerStyle beerStyle,
+                                   @RequestParam(required = false) Boolean showInventory) {
         log.debug("listBeers was called, in Controller");
-        return beerService.listBeers(beerName, beerStyle);
+        return beerService.listBeers(beerName, beerStyle, showInventory);
     }
 
     @GetMapping(BASE_URL_ID)
