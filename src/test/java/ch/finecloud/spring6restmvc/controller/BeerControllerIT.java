@@ -7,11 +7,13 @@ import ch.finecloud.spring6restmvc.model.BeerStyle;
 import ch.finecloud.spring6restmvc.repositories.BeerRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
+import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -68,8 +70,8 @@ class BeerControllerIT {
                         .queryParam("pageNumber", "2")
                         .queryParam("pageSize", "50"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()", is(50)))
-                .andExpect(jsonPath("$.[0].quantityOnHand").value(IsNull.notNullValue()));
+                .andExpect(jsonPath("$.content.size()", is(50)))
+                .andExpect(jsonPath("$.content[0].quantityOnHand").value(IsNull.notNullValue()));
     }
 
     @Test
@@ -77,10 +79,11 @@ class BeerControllerIT {
         mockMvc.perform(get(BeerController.BASE_URL)
                         .queryParam("beerName", "IPA")
                         .queryParam("beerStyle", BeerStyle.IPA.name())
-                        .queryParam("showInventory", "true"))
+                        .queryParam("showInventory", "true")
+                        .queryParam("pageSize", "800"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()", is(310)))
-                .andExpect(jsonPath("$.[0].quantityOnHand").value(IsNull.notNullValue()));
+                .andExpect(jsonPath("$.content.size()", is(310)))
+                .andExpect(jsonPath("$.content.[0].quantityOnHand").value(IsNull.notNullValue()));
     }
 
     @Test
@@ -88,34 +91,39 @@ class BeerControllerIT {
         mockMvc.perform(get(BeerController.BASE_URL)
                         .queryParam("beerName", "IPA")
                         .queryParam("beerStyle", BeerStyle.IPA.name())
-                        .queryParam("showInventory", "false"))
+                        .queryParam("showInventory", "false")
+                        .queryParam("pageSize", "800"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()", is(310)))
-                .andExpect(jsonPath("$.[0].quantityOnHand").value(IsNull.nullValue()));
+                .andExpect(jsonPath("$.content.size()", is(310)))
+                .andExpect(jsonPath("$.content.[0].quantityOnHand").value(IsNull.nullValue()));
     }
 
     @Test
     void tesListBeersByStyleAndName() throws Exception {
         mockMvc.perform(get(BeerController.BASE_URL)
                         .queryParam("beerName", "IPA")
-                        .queryParam("beerStyle", BeerStyle.IPA.name()))
+                        .queryParam("beerStyle", BeerStyle.IPA.name())
+                        .queryParam("pageSize", "800"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()", is(310)));
+                .andExpect(jsonPath("$.content.size()", is(310)));
     }
 
     @Test
     void testListBeerByBeerStyle() throws Exception {
         mockMvc.perform(get(BeerController.BASE_URL)
-                        .queryParam("beerStyle", BeerStyle.LAGER.name()))
+                        .queryParam("beerStyle", BeerStyle.LAGER.name())
+                        .queryParam("pageSize", "100"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()", is(39)));
+                .andExpect(jsonPath("$.content.length()", is(39)));
     }
 
     @Test
     void testListBeerByName() throws Exception {
-        mockMvc.perform(get(BeerController.BASE_URL).queryParam("beerName", "IPA"))
+        mockMvc.perform(get(BeerController.BASE_URL)
+                        .queryParam("beerName", "IPA")
+                        .queryParam("pageSize", "400"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()", is(336)));
+                .andExpect(jsonPath("$.content.length()", is(336)));
     }
 
     @Test
@@ -198,8 +206,8 @@ class BeerControllerIT {
 
     @Test
     void testListBeers() {
-        List<BeerDTO> beerDTOList = beerController.listBeers(null, null, false);
-        assertThat(beerDTOList.size()).isEqualTo(2413);
+        Page<BeerDTO> beerDTOList = beerController.listBeers(null, null, false, 1, 25);
+        assertThat(beerDTOList.getContent().size()).isEqualTo(25);
     }
 
     @Rollback
@@ -207,7 +215,7 @@ class BeerControllerIT {
     @Test
     void testEmptyList() {
         beerRepository.deleteAll();
-        List<BeerDTO> beerDTOList = beerController.listBeers(null, null, false);
-        assertThat(beerDTOList.size()).isEqualTo(0);
+        Page<BeerDTO> beerDTOList = beerController.listBeers(null, null, false, 1, 25);
+        assertThat(beerDTOList.getContent().size()).isEqualTo(0);
     }
 }
