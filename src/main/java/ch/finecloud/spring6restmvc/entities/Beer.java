@@ -30,24 +30,32 @@ public class Beer {
     @JdbcTypeCode(SqlTypes.CHAR)
     @Column(length = 36, columnDefinition = "varchar(36)", updatable = false, nullable = false)
     private UUID id;
+
     @NotNull
     @NotBlank
     @Size(max = 50)
     @Column(length = 50)
     private String beerName;
+
     @Version
     private Integer version;
+
     @NotNull
     private BeerStyle beerStyle;
+
     @NotBlank
     @NotNull
     @Size(max = 255)
     private String upc;
+
     private Integer quantityOnHand;
+
     @NotNull
     private BigDecimal price;
+
     @CreationTimestamp
     private LocalDateTime createdDate;
+
     @UpdateTimestamp
     private LocalDateTime updateDate;
 }
