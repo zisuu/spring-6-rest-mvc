@@ -1,8 +1,11 @@
 package ch.finecloud.spring6restmvc.repositories;
 
 import ch.finecloud.spring6restmvc.entities.Beer;
+import ch.finecloud.spring6restmvc.entities.BeerOrder;
+import ch.finecloud.spring6restmvc.entities.BeerOrderLine;
 import ch.finecloud.spring6restmvc.entities.Customer;
 import ch.finecloud.spring6restmvc.model.BeerStyle;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,12 +35,16 @@ class BeerOrderRepositoryTest {
         testBeer = beerRepository.findAll().get(0);
     }
 
+    @Transactional
     @Test
     void testBeerOrders() {
-        System.out.println(beerOrderRepository.count());
-        System.out.println(customerRepository.count());
-        System.out.println(beerRepository.count());
-        System.out.println(testCustomer.getCustomerName());
-        System.out.println(testBeer.getBeerName());
+        BeerOrder beerOrder = BeerOrder.builder()
+                .customerRef("Test order")
+                .customer(testCustomer)
+                .build();
+
+        BeerOrder savedBeerOrder = beerOrderRepository.save(beerOrder);
+
+        System.out.println(savedBeerOrder.getCustomerRef());
     }
 }
