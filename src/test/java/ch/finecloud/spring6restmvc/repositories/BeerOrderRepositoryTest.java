@@ -1,9 +1,6 @@
 package ch.finecloud.spring6restmvc.repositories;
 
-import ch.finecloud.spring6restmvc.entities.Beer;
-import ch.finecloud.spring6restmvc.entities.BeerOrder;
-import ch.finecloud.spring6restmvc.entities.BeerOrderLine;
-import ch.finecloud.spring6restmvc.entities.Customer;
+import ch.finecloud.spring6restmvc.entities.*;
 import ch.finecloud.spring6restmvc.model.BeerStyle;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,6 +38,9 @@ class BeerOrderRepositoryTest {
         BeerOrder beerOrder = BeerOrder.builder()
                 .customerRef("Test order")
                 .customer(testCustomer)
+                .beerOrderShipment(BeerOrderShipment.builder()
+                        .trackingNumber("345234R")
+                        .build())
                 .build();
 
         BeerOrder savedBeerOrder = beerOrderRepository.save(beerOrder);
