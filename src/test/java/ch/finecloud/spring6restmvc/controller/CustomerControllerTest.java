@@ -1,5 +1,6 @@
 package ch.finecloud.spring6restmvc.controller;
 
+import ch.finecloud.spring6restmvc.config.SpringSecurityConfig;
 import ch.finecloud.spring6restmvc.model.BeerDTO;
 import ch.finecloud.spring6restmvc.model.CustomerDTO;
 import ch.finecloud.spring6restmvc.services.CustomerService;
@@ -12,6 +13,7 @@ import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -25,10 +27,12 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(CustomerController.class)
+@Import(SpringSecurityConfig.class)
 class CustomerControllerTest {
 
     @Autowired
@@ -59,6 +63,7 @@ class CustomerControllerTest {
         Map<String, Object> customerMap = new HashMap<>();
         customerMap.put("customerName", "New CustomerDTO Name");
         mockMvc.perform(patch(CustomerController.BASE_URL_ID, testCustomerDTO.getId())
+                        .with(httpBasic("user1", "password1"))
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(customerMap)))
@@ -73,6 +78,7 @@ class CustomerControllerTest {
         CustomerDTO testCustomerDTO = customerServiceImpl.listCustomers().get(0);
         given(customerService.deleteById(any())).willReturn(true);
         mockMvc.perform(delete(CustomerController.BASE_URL_ID, testCustomerDTO.getId())
+                        .with(httpBasic("user1", "password1"))
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
@@ -86,6 +92,7 @@ class CustomerControllerTest {
         CustomerDTO testCustomerDTO = customerServiceImpl.listCustomers().get(0);
         given(customerService.updateCustomerById(any(UUID.class), any(CustomerDTO.class))).willReturn(Optional.of(testCustomerDTO));
         mockMvc.perform(put(CustomerController.BASE_URL_ID, testCustomerDTO.getId())
+                        .with(httpBasic("user1", "password1"))
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(testCustomerDTO)))
@@ -100,6 +107,7 @@ class CustomerControllerTest {
         testCustomerDTO.setVersion(null);
         given(customerService.saveNewCustomer(any(CustomerDTO.class))).willReturn(customerServiceImpl.listCustomers().get(1));
         mockMvc.perform(post(CustomerController.BASE_URL)
+                        .with(httpBasic("user1", "password1"))
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(testCustomerDTO)))
@@ -111,6 +119,7 @@ class CustomerControllerTest {
     void testListCustomers() throws Exception {
         given(customerService.listCustomers()).willReturn(customerServiceImpl.listCustomers());
         mockMvc.perform(get(CustomerController.BASE_URL)
+                        .with(httpBasic("user1", "password1"))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -122,6 +131,8 @@ class CustomerControllerTest {
         CustomerDTO testCustomerDTO = customerServiceImpl.listCustomers().get(0);
         given(customerService.getCustomerById(testCustomerDTO.getId())).willReturn(Optional.of(testCustomerDTO));
         mockMvc.perform(get(CustomerController.BASE_URL_ID, testCustomerDTO.getId())
+
+                        .with(httpBasic("user1", "password1"))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -133,6 +144,7 @@ class CustomerControllerTest {
     void getCustomerByIdNotFound() throws Exception {
         given(customerService.getCustomerById(any(UUID.class))).willReturn(Optional.empty());
         mockMvc.perform(get(CustomerController.BASE_URL_ID, UUID.randomUUID())
+                        .with(httpBasic("user1", "password1"))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
