@@ -7,13 +7,14 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 public class SpringSecurityConfig {
-
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests()
-                .anyRequest()
-                .authenticated()
+                .requestMatchers("/v3/api-docs**", "/swagger-ui/**",  "/swagger-ui.html")
+                .permitAll()
+                .anyRequest().authenticated()
                 .and().oauth2ResourceServer().jwt();
+
         return http.build();
     }
 }
